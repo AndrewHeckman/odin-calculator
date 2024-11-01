@@ -101,6 +101,7 @@ function clear() {
   clearFlag = true;
   args = [];
   argIndex = 0;
+  result = 0;
 }
 
 function backspace() {
@@ -115,7 +116,6 @@ function backspace() {
 
     if (args[argIndex].length === 1) {
       args.pop();
-      argIndex--;
     }
     else {
       args[argIndex] = args[argIndex].slice(0, -1);
