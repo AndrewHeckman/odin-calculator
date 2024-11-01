@@ -124,6 +124,10 @@ function backspace() {
 }
 
 function evaluateEquation() {
+  // empty array do nothing
+  if (args.length === 0) return;
+  // number + operator, disregard operator
+  if (args.length === 2) args.pop();
   let num1;
   let num2;
   let operator;
@@ -135,11 +139,11 @@ function evaluateEquation() {
   }
   argIndex = 0;
   result = args.shift();
+  args = [];
 }
 
 /* TODO:
 add support for negatives
-handle user pressing enter early
 handle dividing by 0
 support floating point
 round long floats
