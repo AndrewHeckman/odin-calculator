@@ -1,8 +1,8 @@
-let num1;             // first number in equation
-let num2;             // second number in equation
-let operator;         // mathematical operator from equation
+let args = [];        // argument array of alternating numbers and operations
+let argIndex = 0;     // next empty array element
 let result = 0;       // result of equation, used for ans button
-let clearFlag = true; // true if display needs to be emptied before adding input 
+let clearFlag = true; // true if display needs to be emptied before adding input
+let opflag = true;    // true if last click was an operation
 
 const display = document.querySelector("#display");
 const buttons = document.querySelector("#buttons");
@@ -47,25 +47,43 @@ function operate(num1, num2, operator) {
 }
 
 function handleClick(event) {
-  let button = event.target.id;
-  switch (button) {
+  let buttonId = event.target.id;
+  let buttonText = event.target.textContent;
+  switch (buttonId) {
     case "clear":
       clear();
       break;
     case "backspace":
       backspace();
       break;
-    case "answer":
-      addToDisplay(result);
-      break;
     case "equals":
-      parseEquation();
-      result = operate(num1, num2, operator);
+      evaluateEquation();
       display.textContent = result;
       clearFlag = true;
       break;
+    case "answer":
+      buttonId += "number";
+      buttonText = result.toString();
     default:
-      addToDisplay(event.target.textContent);
+      if (buttonId.includes("number")) {
+        if (typeof args[argIndex] === "undefined") {
+          args.push(buttonText);
+        }
+        else {
+          args[argIndex] += buttonText;
+        }
+        opflag = false;
+      }
+      else {
+        if (argIndex === 0 && typeof args[argIndex] === "undefined") {
+          args[0] = result;
+          addToDisplay(result);
+        }
+        args.push(buttonText);
+        argIndex += 2;
+        opflag = true;
+      }
+      addToDisplay(buttonText);
       break;
   }
 }
@@ -81,27 +99,46 @@ function addToDisplay(str) {
 function clear() {
   display.textContent = "0";
   clearFlag = true;
+  args = [];
+  argIndex = 0;
 }
 
 function backspace() {
   // if backspacing over last character, behavior is the same as clearing
   if (display.textContent.length == 1) clear();
-  else display.textContent = display.textContent.slice(0, -1);
+  else{
+    display.textContent = display.textContent.slice(0, -1);
+
+    if (typeof args[argIndex] === "undefined") {
+      argIndex--;
+    }
+
+    if (args[argIndex].length === 1) {
+      args.pop();
+      argIndex--;
+    }
+    else {
+      args[argIndex] = args[argIndex].slice(0, -1);
+    }
+  }
 }
 
-function parseEquation() {
-  let str = display.textContent;
-  let index = str.search(/[\+\-\÷\×\%]/);
-  num1 = parseFloat(str.slice(0, index));
-  operator = str[index];
-  num2 = parseFloat(str.slice((index+1), str.length));
+function evaluateEquation() {
+  let num1;
+  let num2;
+  let operator;
+  while (args.length > 2) {
+    num1 = parseFloat(args.shift());
+    operator = args.shift();
+    num2 = parseFloat(args[0]);
+    args[0] = operate(num1, num2, operator);
+  }
+  argIndex = 0;
+  result = args.shift();
 }
 
 /* TODO:
-support multiple operations in sequence
-  change to accepting an array instead of num1, num2, and op
-  each element will be a number or operator alternating
-  will need a number flag, true if last input was a number, for keeping track of negatives
+add support for negatives
 handle user pressing enter early
 handle dividing by 0
 support floating point
