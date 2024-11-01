@@ -58,7 +58,7 @@ function handleClick(event) {
       break;
     case "equals":
       evaluateEquation();
-      display.textContent = result;
+      display.textContent = result.toString();
       clearFlag = true;
       break;
     case "answer":
@@ -76,8 +76,8 @@ function handleClick(event) {
       }
       else {
         if (argIndex === 0 && typeof args[argIndex] === "undefined") {
-          args[0] = result;
-          addToDisplay(result);
+          args[0] = result.toString();
+          addToDisplay(result.toString());
         }
         args.push(buttonText);
         argIndex += 2;
