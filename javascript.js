@@ -61,8 +61,7 @@ function handleClick(event) {
       evaluateEquation();
       clearFlag = true;
       break;
-    case "answer":
-      buttonId += "number";
+    case "number-answer":
       buttonText = result.toString();
     default:
       if (buttonId.includes("number")) {
@@ -152,7 +151,6 @@ function evaluateEquation() {
 
 /* TODO:
 add support for negatives
-handle dividing by 0
 support floating point
 round long floats
 add keyboard support
