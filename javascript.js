@@ -38,6 +38,7 @@ function operate(num1, num2, operator) {
     case "×":
       return multiply(num1, num2);
     case "÷":
+      if (num2 === 0) return "You know better than to try that.";
       return divide(num1, num2);
     case "%":
       return modulo(num1, num2);
@@ -58,7 +59,6 @@ function handleClick(event) {
       break;
     case "equals":
       evaluateEquation();
-      display.textContent = result.toString();
       clearFlag = true;
       break;
     case "answer":
@@ -107,7 +107,7 @@ function clear() {
 function backspace() {
   // if backspacing over last character, behavior is the same as clearing
   if (display.textContent.length == 1) clear();
-  else{
+  else {
     display.textContent = display.textContent.slice(0, -1);
 
     if (typeof args[argIndex] === "undefined") {
@@ -136,10 +136,18 @@ function evaluateEquation() {
     operator = args.shift();
     num2 = parseFloat(args[0]);
     args[0] = operate(num1, num2, operator);
+    if (args[0] === "You know better than to try that.") {
+      argIndex = 0;
+      result = 0;
+      display.textContent = args.shift().toString();
+      args = [];
+      return;
+    }
   }
   argIndex = 0;
   result = args.shift();
   args = [];
+  display.textContent = result.toString();
 }
 
 /* TODO:
@@ -148,4 +156,5 @@ handle dividing by 0
 support floating point
 round long floats
 add keyboard support
+PEMDAS
 */
