@@ -31,16 +31,16 @@ function modulo(a, b) {
 
 function operate(num1, num2, operator) {
   switch (operator) {
-    case "+":
+    case "add":
       return add(num1, num2);
-    case "-":
+    case "subtract":
       return subtract(num1, num2);
-    case "×":
+    case "multiply":
       return multiply(num1, num2);
-    case "÷":
+    case "divide":
       if (num2 === 0) return "You know better than to try that.";
       return divide(num1, num2);
-    case "%":
+    case "modulo":
       return modulo(num1, num2);
     default:
       return;
@@ -78,7 +78,7 @@ function handleClick(event) {
           args[0] = result.toString();
           addToDisplay(result.toString());
         }
-        args.push(buttonText);
+        args.push(buttonId);
         argIndex += 2;
         opflag = true;
       }
