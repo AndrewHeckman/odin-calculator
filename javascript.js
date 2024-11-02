@@ -9,6 +9,7 @@ const display = document.querySelector("#display");
 const buttons = document.querySelector("#buttons");
 
 buttons.addEventListener("click", handleClick);
+window.addEventListener("keydown", handleKeydown);
 
 function add(a, b) {
   return a + b;
@@ -107,7 +108,15 @@ function handleClick(event) {
       addToDisplay(buttonText);
       break;
   }
-  logVars();
+}
+
+function handleKeydown(event) {
+  if (event.key === "="){
+    document.querySelector(`button[data-key='Enter']`).click();
+  }
+  else if (event.key != "Shift") {
+    document.querySelector(`button[data-key='${event.key}']`).click();
+  }
 }
 
 function addToDisplay(str) {
