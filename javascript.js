@@ -4,6 +4,7 @@ let result = 0;       // result of equation, used for ans button
 let clearFlag = true; // true if display needs to be emptied before adding input
 let opFlag = true;    // true if last click was an operation
 let decFlag = false;  // true if number contains a decimal
+const precision = 4;  // float precision
 
 const display = document.querySelector("#display");
 const buttons = document.querySelector("#buttons");
@@ -64,7 +65,7 @@ function handleClick(event) {
       clearFlag = true;
       break;
     case "number-answer":
-      buttonText = result.toString();
+      buttonText = parseFloat(result.toFixed(precision));
     default:
       if (buttonId === "number-decimal") {
         if (decFlag) break;
@@ -212,12 +213,10 @@ function evaluateEquation() {
   argIndex = 0;
   result = args.shift();
   args = [];
-  display.textContent = result.toString();
+  display.textContent = parseFloat(result.toFixed(precision));
 }
 
 /* TODO:
-round long floats
-add keyboard support
 PEMDAS
 */
 
