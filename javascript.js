@@ -2,7 +2,8 @@ let args = [];        // argument array of alternating numbers and operations
 let argIndex = 0;     // next empty array element
 let result = 0;       // result of equation, used for ans button
 let clearFlag = true; // true if display needs to be emptied before adding input
-let opflag = true;    // true if last click was an operation
+let opFlag = true;    // true if last click was an operation
+let decFlag = false;  // true if number contains a decimal
 
 const display = document.querySelector("#display");
 const buttons = document.querySelector("#buttons");
@@ -64,6 +65,15 @@ function handleClick(event) {
     case "number-answer":
       buttonText = result.toString();
     default:
+      if (buttonId === "number-decimal") {
+        if (decFlag) break;
+        if (opFlag) {
+          args.push("0");
+          addToDisplay("0");
+        }
+        decFlag = true;
+      }
+
       if (buttonId.includes("number")) {
         if (typeof args[argIndex] === "undefined") {
           args.push(buttonText);
@@ -71,7 +81,18 @@ function handleClick(event) {
         else {
           args[argIndex] += buttonText;
         }
-        opflag = false;
+        opFlag = false;
+      }
+      else if (buttonId === "subtract" && opFlag) {
+        if (typeof args[argIndex] === "undefined") {
+          args.push(buttonText);
+        }
+        else if (args[argIndex].at(0) === "-") {
+          break;
+        }
+        else {
+          args[argIndex] += buttonText;
+        }
       }
       else {
         if (argIndex === 0 && typeof args[argIndex] === "undefined") {
@@ -80,11 +101,13 @@ function handleClick(event) {
         }
         args.push(buttonId);
         argIndex += 2;
-        opflag = true;
+        opFlag = true;
+        decFlag = false;
       }
       addToDisplay(buttonText);
       break;
   }
+  logVars();
 }
 
 function addToDisplay(str) {
@@ -101,24 +124,58 @@ function clear() {
   args = [];
   argIndex = 0;
   result = 0;
+  opFlag = true;
+  decFlag = false;
 }
 
 function backspace() {
   // if backspacing over last character, behavior is the same as clearing
-  if (display.textContent.length == 1) clear();
+  if (display.textContent.length == 1) {
+    clear();
+    return;
+  }
+
+  // removes corresponding flags
+  switch (args.at(-1)) {
+    case ".":
+      decFlag = false;
+      break;
+    case "add":
+    case "subtract":
+    case "multiply":
+    case "divide":
+    case "modulo":
+      opFlag = false;
+      break;
+  }
+
+  display.textContent = display.textContent.slice(0, -1);
+
+  if (typeof args[argIndex] === "undefined") {
+    argIndex--;
+  }
+
+  // if arg is an operation or single-digit number, the whole thing is removed
+  if (Number.isNaN(Number(args[argIndex])) && args[argIndex] != "-") {
+    args.pop();
+    argIndex--;
+  }
+  else if ((args[argIndex].length === 1)) {
+    args.pop();
+  }
   else {
-    display.textContent = display.textContent.slice(0, -1);
+    args[argIndex] = args[argIndex].slice(0, -1);
+  }
 
-    if (typeof args[argIndex] === "undefined") {
-      argIndex--;
-    }
-
-    if (args[argIndex].length === 1) {
-      args.pop();
-    }
-    else {
-      args[argIndex] = args[argIndex].slice(0, -1);
-    }
+  // reapply opFlag if necessary
+  switch (args.at(-1)) {
+    case "add":
+    case "subtract":
+    case "multiply":
+    case "divide":
+    case "modulo":
+      opFlag = true;
+      break;
   }
 }
 
@@ -150,9 +207,18 @@ function evaluateEquation() {
 }
 
 /* TODO:
-add support for negatives
-support floating point
 round long floats
 add keyboard support
 PEMDAS
 */
+
+function logVars() {
+  console.log(
+    `args: ${args}
+argIndex: ${argIndex}
+result: ${result}
+clearFlag: ${clearFlag}
+opFlag: ${opFlag}
+decFlag: ${decFlag}`
+  );
+}
