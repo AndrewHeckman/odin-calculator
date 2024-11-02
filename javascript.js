@@ -41,7 +41,6 @@ function operate(num1, num2, operator) {
     case "multiply":
       return multiply(num1, num2);
     case "divide":
-      if (num2 === 0) return "You know better than to try that.";
       return divide(num1, num2);
     case "modulo":
       return modulo(num1, num2);
@@ -98,8 +97,8 @@ function handleClick(event) {
       }
       else {
         if (argIndex === 0 && typeof args[argIndex] === "undefined") {
-          args[0] = result.toString();
-          addToDisplay(result.toString());
+          args[0] = result;
+          addToDisplay(args[0]);
         }
         args.push(buttonId);
         argIndex += 2;
@@ -197,27 +196,40 @@ function evaluateEquation() {
   let num1;
   let num2;
   let operator;
+
+  // find and evaluate multiplication, division, and modulo first
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "multiply" || args[i] === "divide" || args[i] === "modulo") {
+      result = operate(args[i-1], args[i+1], args[i]);
+      if (result === Infinity) {
+        argIndex = 0;
+        result = 0;
+        args = [];
+        display.textContent = "You should know better than to try that.";
+        return;
+      }
+      args.splice(i-1, 3, result.toString());
+      console.log(args);
+      console.log(args.length);
+      i--;
+    }
+  }
+
   while (args.length > 2) {
     num1 = parseFloat(args.shift());
     operator = args.shift();
     num2 = parseFloat(args[0]);
-    args[0] = operate(num1, num2, operator);
-    if (args[0] === "You know better than to try that.") {
-      argIndex = 0;
-      result = 0;
-      display.textContent = args.shift().toString();
-      args = [];
-      return;
-    }
+    result = operate(num1, num2, operator);
+    args[0] = result;
   }
   argIndex = 0;
-  result = args.shift();
+  result = parseFloat(args.shift());
   args = [];
   display.textContent = parseFloat(result.toFixed(precision));
 }
 
 /* TODO:
-PEMDAS
+make pretty
 */
 
 function logVars() {
